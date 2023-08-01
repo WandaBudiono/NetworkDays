@@ -130,9 +130,11 @@ if uploaded_file is not None:
 
     # Display the pivot table
     st.write(pivot_table)
+    st.dataframe(pivot_table)
 
     # Display the measurable objectives
     st.write(Measurable_objective)
+    st.dataframe(Measurable_objective)
 else:
     # If no file is uploaded, show a message
     st.warning('Please upload a CSV file.')
