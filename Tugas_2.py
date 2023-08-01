@@ -111,9 +111,13 @@ if uploaded_file is not None:
     pivot_table['Sum Same Day - N+7']= pivot_table['Same Day']+pivot_table['N+1']+pivot_table['N+2']+pivot_table['N+3']+pivot_table['N+4']+pivot_table['N+5']+pivot_table['N+6']+pivot_table['N+7']
 
     # Calculate the total of 'Grouped Work Days' for each 'n+1', 'n+2', 'n+3', etc.
-    totals = pivot_table.sum()
+    # Fill NaN values with 0 after performing the pivot operation
+    pivot_table = pivot_table.fillna(0)
+
+    # Calculate the total of 'Grouped Work Days' for each 'n+1', 'n+2', 'n+3', etc.
+    totals = pivot_table.sum(numeric_only=True, axis=0)
     totals.name = 'Total'
-    pivot_table = pivot_table.append(totals)
+    pivot_table = pd.concat([pivot_table, totals.to_frame().T], axis=0)
     pivot_table = pivot_table[['Same Day','N+1','N+2','N+3','N+4','N+5','N+6','N+7','N++','Sum Same Day - N+7','Total']]
 
     # calculate the values
