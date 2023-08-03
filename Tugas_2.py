@@ -144,13 +144,13 @@ if uploaded_file is not None:
     pivot_table_Transpose["Percentage"] = pivot_table_Transpose['Total']/Measurable_objective['PR Item Received'][0]*100
     pivot_table_Transpose['Percentage'] = pivot_table_Transpose['Percentage'].apply(format_percentage)
     pivot_table= pivot_table_Transpose.T
-    pivot_table
     
     # Display the measurable objectives
     st.subheader("PR - VS")
     st.write(Measurable_objective)
     
     # Display the pivot table
+    st.subheader("Count of Network Days")
     st.write(pivot_table)
 else:
     # If no file is uploaded, show a message
