@@ -119,6 +119,10 @@ if uploaded_file is not None:
     totals.name = 'Total'
     pivot_table = pd.concat([pivot_table, totals.to_frame().T], axis=0)
     pivot_table = pivot_table[['Same Day','N+1','N+2','N+3','N+4','N+5','N+6','N+7','N++','Sum Same Day - N+7','Total']]
+    pivot_table_Transpose = pivot_table.T
+    pivot_table_Transpose["Percentage"] = pivot_table_Transpose['Total']/Measurable_objective['PR Item Received'][0]*100
+    pivot_table= pivot_table_Transpose.T
+    pivot_table
 
     # calculate the values
     PR_Item_Received = Tugas_2['PR Date Approve'].count()
@@ -131,12 +135,12 @@ if uploaded_file is not None:
     Overdue = pd.DataFrame({'Overdue': [Overdue]})
     # Concatenate the DataFrames vertically
     Measurable_objective = pd.concat([PR_Item_Received, PR_Item_to_VS_Created, Overdue], axis=1)
-
-    # Display the pivot table
-    st.write(pivot_table)
-
+    
     # Display the measurable objectives
     st.write(Measurable_objective)
+    
+    # Display the pivot table
+    st.write(pivot_table)
 else:
     # If no file is uploaded, show a message
     st.warning('Please upload a CSV file.')
