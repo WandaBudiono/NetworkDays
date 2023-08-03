@@ -3,6 +3,9 @@ from datetime import date
 import holidays
 import streamlit as st
 
+# App title
+st.title ("KPI PR - VS")
+
 # Function to read the uploaded CSV file and return a DataFrame
 def read_csv_file(uploaded_file):
     return pd.read_csv(uploaded_file)
@@ -137,9 +140,11 @@ if uploaded_file is not None:
     pivot_table
     
     # Display the measurable objectives
+    st.subheader("PR - VS")
     st.write(Measurable_objective)
     
     # Display the pivot table
+    st.subheader("Count of Network Days")
     st.write(pivot_table)
 else:
     # If no file is uploaded, show a message
