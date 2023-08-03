@@ -99,6 +99,18 @@ if uploaded_file is not None:
     # Apply the grouping function to the 'Total Work Days' column
     Tugas_2['Network Days'] = Tugas_2['Total Work Days'].apply(apply_grouping)
 
+    # calculate the values
+    PR_Item_Received = Tugas_2['PR Date Approve'].count()
+    PR_Item_to_VS_Created = Tugas_2['VS Date Created'].count()
+    Overdue = Tugas_2['VS Date Created'].isna().sum()
+
+    # Create individual DataFrames for each value
+    PR_Item_Received = pd.DataFrame({'PR Item Received': [PR_Item_Received]})
+    PR_Item_to_VS_Created = pd.DataFrame({'PR Item to VS Created': [PR_Item_to_VS_Created]})
+    Overdue = pd.DataFrame({'Overdue': [Overdue]})
+    # Concatenate the DataFrames vertically
+    Measurable_objective = pd.concat([PR_Item_Received, PR_Item_to_VS_Created, Overdue], axis=1)
+
     # Group by 'VS Created By' and 'Grouped Work Days', and then calculate the counts
     grouped = Tugas_2.groupby(['VS Created By', 'Network Days']).size().reset_index(name='Count')
 
@@ -123,18 +135,6 @@ if uploaded_file is not None:
     pivot_table_Transpose["Percentage"] = pivot_table_Transpose['Total']/Measurable_objective['PR Item Received'][0]*100
     pivot_table= pivot_table_Transpose.T
     pivot_table
-
-    # calculate the values
-    PR_Item_Received = Tugas_2['PR Date Approve'].count()
-    PR_Item_to_VS_Created = Tugas_2['VS Date Created'].count()
-    Overdue = Tugas_2['VS Date Created'].isna().sum()
-
-    # Create individual DataFrames for each value
-    PR_Item_Received = pd.DataFrame({'PR Item Received': [PR_Item_Received]})
-    PR_Item_to_VS_Created = pd.DataFrame({'PR Item to VS Created': [PR_Item_to_VS_Created]})
-    Overdue = pd.DataFrame({'Overdue': [Overdue]})
-    # Concatenate the DataFrames vertically
-    Measurable_objective = pd.concat([PR_Item_Received, PR_Item_to_VS_Created, Overdue], axis=1)
     
     # Display the measurable objectives
     st.write(Measurable_objective)
