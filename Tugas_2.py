@@ -134,8 +134,15 @@ if uploaded_file is not None:
     totals.name = 'Total'
     pivot_table = pd.concat([pivot_table, totals.to_frame().T], axis=0)
     pivot_table = pivot_table[['Same Day','N+1','N+2','N+3','N+4','N+5','N+6','N+7','N++','Sum Same Day - N+7','Total']]
+
+    # Counting percentage for each network days
     pivot_table_Transpose = pivot_table.T
+    def format_percentage(x):
+        if pd.notna(x):
+            return f'{x:.0f}%'
+        return ''
     pivot_table_Transpose["Percentage"] = pivot_table_Transpose['Total']/Measurable_objective['PR Item Received'][0]*100
+    pivot_table_Transpose['Percentage'] = pivot_table_Transpose['Percentage'].apply(format_percentage)
     pivot_table= pivot_table_Transpose.T
     pivot_table
     
@@ -144,7 +151,6 @@ if uploaded_file is not None:
     st.write(Measurable_objective)
     
     # Display the pivot table
-    st.subheader("Count of Network Days")
     st.write(pivot_table)
 else:
     # If no file is uploaded, show a message
