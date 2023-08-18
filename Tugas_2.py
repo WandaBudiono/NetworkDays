@@ -261,7 +261,7 @@ if Tugas_2 is not None:
     else:
         st.write("") 
         
-    if st.button("Export to Excel"):
+    if st.button("Export to Excel with Selected Month"):
         excel_filename = "Result.xlsx"
         with pd.ExcelWriter(excel_filename, engine="openpyxl") as writer:
             Measurable_objective.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=3, header=True, index=False) # Default position: cell A1.
