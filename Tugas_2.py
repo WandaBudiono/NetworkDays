@@ -267,7 +267,7 @@ if Tugas_2 is not None:
             Measurable_objective.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=3, header=True, index=False) # Default position: cell A1.
             all_month.to_excel(writer, sheet_name="Sheet_1", startcol=8, startrow=3, header=True, index=True) 
             percentage_result.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=6, header=True, index=False)
-            selected_data.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=35, header=True, index=True)
+            (calculate_metrics(selected_data)).to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=35, header=True, index=True)
             # Mengubah file Excel menjadi bytes
         byte_io = BytesIO()
         with open(excel_filename, "rb") as file:
