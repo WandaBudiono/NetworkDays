@@ -5,10 +5,7 @@ import pandas as pd
 from datetime import date
 import holidays
 import plotly.express as px
-import plotly.io as pio
 from io import BytesIO
-import io
-from PIL import Image
 
 
 # Upload CSV file using Streamlit's sidebar
