@@ -267,5 +267,20 @@ if Tugas_2 is not None:
             st.write("No data available for the selected months.")
     else:
         st.write("")  
+        
+    if st.button("Export to Excel with Selected Month"):
+        excel_filename = "Result.xlsx"
+        with pd.ExcelWriter(excel_filename, engine="openpyxl") as writer:
+            Measurable_objective.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=3, header=True, index=False) # Default position: cell A1.
+            all_month.to_excel(writer, sheet_name="Sheet_1", startcol=8, startrow=3, header=True, index=True) 
+            percentage_result.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=6, header=True, index=False)
+            (calculate_metrics(selected_data)).to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=35, header=True, index=True)
+            # Mengubah file Excel menjadi bytes
+        byte_io = BytesIO()
+        with open(excel_filename, "rb") as file:
+            byte_io.write(file.read())
+        byte_io.seek(0)
+        st.download_button(label="Download Excel", data=byte_io, file_name=excel_filename)
+        
 else:
     st.warning("Please upload a CSV file to get started.")
