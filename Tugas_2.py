@@ -5,10 +5,8 @@ import pandas as pd
 from datetime import date
 import holidays
 import plotly.express as px
-import plotly.io as pio
 from io import BytesIO
-import io
-from PIL import Image
+
 
 st.title ("PR - VS")
 
@@ -19,9 +17,11 @@ Tugas_2 = st.sidebar.file_uploader('Upload a CSV file', type=['csv'])
 if Tugas_2 is not None:
     Tugas_2 = pd.read_csv(Tugas_2)
     
-    Tugas_2['PR Date Create'] = pd.to_datetime(Tugas_2['PR Date Create'])
-    Tugas_2['PR Date Approve'] = pd.to_datetime(Tugas_2['PR Date Approve'])
-    Tugas_2['VS Date Created'] = pd.to_datetime(Tugas_2['VS Date Created'])
+    Tugas_2['Approval Date (PR)'] = pd.to_datetime(Tugas_2['Approval Date (PR)'])
+    Tugas_2['VS Created Date'] = pd.to_datetime(Tugas_2['VS Created Date'])
+    Tugas_2 = Tugas_2[Tugas_2["PR Status"] == "Approved"]
+    selected_columns = ['Request ID', 'Title', 'Asset Type', 'Request Date', 'PR Item Description', 'PR Line Created Date', 'PR Status', 'Approval Date (PR)', 'VS ID Name','VS Title', 'VS Created By', 'VS Created Date','VSA Number','VS Approved By', 'VS Approval Date', 'VS Status']
+    Tugas_2 = Tugas_2[selected_columns]
 
     # Function to count Saturdays in the date range
     def count_saturdays(date_start, date_end):
@@ -44,13 +44,13 @@ if Tugas_2 is not None:
         return count
 
     # Calculate the difference between 'VS Date Created' and 'PR Date Approve' in days
-    Tugas_2['Range (days)'] = (Tugas_2['VS Date Created'] - Tugas_2['PR Date Approve']).dt.days
+    Tugas_2['Range (days)'] = (Tugas_2['VS Created Date'] - Tugas_2['Approval Date (PR)']).dt.days
 
     # Calculate the number of Saturdays for each row in the DataFrame
-    Tugas_2['Number of Saturdays'] = Tugas_2.apply(lambda row: count_saturdays(row['PR Date Approve'], row['VS Date Created']), axis=1)
+    Tugas_2['Number of Saturdays'] = Tugas_2.apply(lambda row: count_saturdays(row['Approval Date (PR)'], row['VS Created Date']), axis=1)
 
     # Calculate the number of Sundays for each row in the DataFrame
-    Tugas_2['Number of Sundays'] = Tugas_2.apply(lambda row: count_sundays(row['PR Date Approve'], row['VS Date Created']), axis=1)
+    Tugas_2['Number of Sundays'] = Tugas_2.apply(lambda row: count_sundays(row['Approval Date (PR)'], row['VS Created Date']), axis=1)
 
     # Create a list of Indonesian holidays
     indonesia_holidays = holidays.Indonesia(years=date.today().year)
@@ -67,10 +67,10 @@ if Tugas_2 is not None:
         return count
 
     # Calculate the difference between 'VS Date Created' and 'PR Date Approve' in days
-    Tugas_2['Range (days)'] = (Tugas_2['VS Date Created'] - Tugas_2['PR Date Approve']).dt.days
+    Tugas_2['Range (days)'] = (Tugas_2['VS Created Date'] - Tugas_2['Approval Date (PR)']).dt.days
 
     # Calculate the number of Indonesian holidays (excluding weekends) for each row in the DataFrame
-    Tugas_2['Number of Indonesian Holidays'] = Tugas_2.apply(lambda row: count_holidays(row['PR Date Approve'], row['VS Date Created']), axis=1)
+    Tugas_2['Number of Indonesian Holidays'] = Tugas_2.apply(lambda row: count_holidays(row['Approval Date (PR)'], row['VS Created Date']), axis=1)
 
     # Calculate the total work days for each row in the DataFrame
     Tugas_2['Total Work Days'] = Tugas_2['Range (days)'] - (Tugas_2['Number of Saturdays'] + Tugas_2['Number of Sundays'] + Tugas_2['Number of Indonesian Holidays'])
@@ -102,7 +102,7 @@ if Tugas_2 is not None:
     Tugas_2['Network Days'] = Tugas_2['Total Work Days'].apply(apply_grouping)
 
     #kolom bulan
-    Tugas_2['Month'] = Tugas_2["VS Date Created"].apply(lambda x : x.month)
+    Tugas_2['Month'] = Tugas_2["VS Created Date"].apply(lambda x : x.month)
     # Fungsi untuk mengubah angka bulan menjadi nama bulan
     def angka_ke_nama_bulan(angka):
         nama_bulan = {
@@ -123,9 +123,9 @@ if Tugas_2 is not None:
 
     Tugas_2['Month'] = Tugas_2['Month'].map(angka_ke_nama_bulan)
 
-    PR_Item_Received = Tugas_2['PR Date Approve'].count()
-    PR_Item_to_VS_Created = Tugas_2['VS Date Created'].count()
-    Overdue = Tugas_2['VS Date Created'].isna().sum()
+    PR_Item_Received = Tugas_2['Approval Date (PR)'].count()
+    PR_Item_to_VS_Created = Tugas_2['VS Created Date'].count()
+    Overdue = Tugas_2['VS Created Date'].isna().sum()
 
     # Create individual DataFrames for each value
     PR_Item_Received_df = pd.DataFrame({'PR Item Received': [PR_Item_Received]})
@@ -153,10 +153,10 @@ if Tugas_2 is not None:
         if input_dataframe.empty:
             return None
 
-        PR_Item_Received = Tugas_2['PR Date Approve'].count()
-        PR_Item_to_VS_Created = Tugas_2['VS Date Created'].count()
-        Overdue = Tugas_2['VS Date Created'].isna().sum()
-        
+        PR_Item_Received = Tugas_2['Approval Date (PR)'].count()
+        PR_Item_to_VS_Created = Tugas_2['VS Created Date'].count()
+        Overdue = Tugas_2['VS Created Date'].isna().sum()
+
         # Create individual DataFrames for each value
         PR_Item_Received_df = pd.DataFrame({'PR Item Received': [PR_Item_Received]})
         PR_Item_to_VS_Created_df = pd.DataFrame({'PR Item to VS Created': [PR_Item_to_VS_Created]})
@@ -174,7 +174,15 @@ if Tugas_2 is not None:
         # Calculate the total of 'Grouped Work Days' for each 'VS Created By'
         pivot_table['Total'] = pivot_table.sum(axis=1)
 
-        pivot_table['Sum Same Day - N+7'] = pivot_table['Same Day'] + pivot_table['N+1'] + pivot_table['N+2'] + pivot_table['N+3'] + pivot_table['N+4'] + pivot_table['N+5'] + pivot_table['N+6'] + pivot_table['N+7']
+        columns_to_sum = ['Same Day', 'N+1', 'N+2', 'N+3', 'N+4', 'N+5', 'N+6', 'N+7']
+
+        # Initialize the sum column with zeros
+        pivot_table['Sum Same Day - N+7'] = 0
+
+        # Iterate through the columns and calculate the sum
+        for col in columns_to_sum:
+            if col in pivot_table.columns:
+                pivot_table['Sum Same Day - N+7'] += pivot_table[col]
 
         # Fill NaN values with 0 after performing the pivot operation
         pivot_table = pivot_table.fillna(0)
@@ -184,27 +192,43 @@ if Tugas_2 is not None:
         totals.name = 'Total'
         pivot_table = pd.concat([pivot_table, totals.to_frame().T], axis=0)
 
-        pivot_table = pivot_table[['Same Day', 'N+1', 'N+2', 'N+3', 'N+4', 'N+5', 'N+6', 'N+7', 'N++', 'Sum Same Day - N+7', 'Total']]
+        values_to_add = ['Sum Same Day - N+7', 'Total']
+
+        # Remove 'Overdue' from the unique Network Days values
+        network_days_unique = input_dataframe['Network Days'].unique()
+        network_days_filtered = [value for value in network_days_unique if value != 'Overdue']
+
+        # Combine the filtered unique Network Days values with the values to add
+        new_network_days = np.append(network_days_filtered, values_to_add)
+
+        # Filter the pivot_table DataFrame columns based on new_network_days
+        pivot_table = pivot_table[new_network_days]
 
         # Counting percentage for each network days
         pivot_table_Transpose = pivot_table.T
-        
+
         def format_percentage(x):
             if pd.notna(x):
                 return f'{x:.2f}%'
             return ''
-        
+
         pivot_table_Transpose["Percentage"] = (pivot_table_Transpose['Total'] / PR_Item_Received) * 100
         pivot_table_Transpose['Percentage'] = pivot_table_Transpose['Percentage'].apply(format_percentage)
         pivot_table = pivot_table_Transpose.T
-        
+
+        columns_to_sort = ['Same Day', 'N+1', 'N+2', 'N+3', 'N+4', 'N+5', 'N+6', 'N+7', 'Sum Same Day - N+7', 'Total']
+
+        # Mengambil hanya kolom-kolom yang ada dalam DataFrame
+        existing_columns = [col for col in columns_to_sort if col in pivot_table.columns]
+
+        # Mengurutkan DataFrame berdasarkan kolom yang ada
+        pivot_table = pivot_table[existing_columns]
+
         return pivot_table
-
-
 
     cum_sum = pd.DataFrame()
 
-    for month in [April, May, June, July, August, September, October, November, December, January, February, March,]:
+    for month in [April, May, June, July, August, September, October, November, December, January, February, March]:
         temp_df = calculate_metrics(month)  # You need to define this function
         if temp_df is not None:
             temp = float(temp_df['Total'].iloc[-1].split('%')[0])
@@ -255,8 +279,7 @@ if Tugas_2 is not None:
             byte_io.write(file.read())
         byte_io.seek(0)
         st.download_button(label="Download Excel", data=byte_io, file_name=excel_filename)
- 
-     
+    
     select_month = st.multiselect('Select Month:', Tugas_2['Month'].unique())
     if select_month:
         selected_data = Tugas_2[Tugas_2['Month'].isin(select_month)]
@@ -267,8 +290,9 @@ if Tugas_2 is not None:
             st.write("No data available for the selected months.")
     else:
         st.write("")  
-        
-    if st.button("Export to Excel with Selected Month"):
+    
+    
+    if st.button("Export to Excel with Selected Data"):
         excel_filename = "Result.xlsx"
         with pd.ExcelWriter(excel_filename, engine="openpyxl") as writer:
             Measurable_objective.to_excel(writer, sheet_name="Sheet_1", startcol=2, startrow=3, header=True, index=False) # Default position: cell A1.
@@ -281,6 +305,5 @@ if Tugas_2 is not None:
             byte_io.write(file.read())
         byte_io.seek(0)
         st.download_button(label="Download Excel", data=byte_io, file_name=excel_filename)
-        
 else:
     st.warning("Please upload a CSV file to get started.")
