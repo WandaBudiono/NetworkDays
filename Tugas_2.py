@@ -8,7 +8,7 @@ import plotly.express as px
 from io import BytesIO
 
 
-st.title ("PR - VS")
+st.title ("PR Item to VS Item")
 
 # Upload CSV file using Streamlit's sidebar
 Tugas_2 = st.sidebar.file_uploader('Upload a CSV file', type=['csv'])
