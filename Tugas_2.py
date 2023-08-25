@@ -310,7 +310,7 @@ else:
 
 st.write(
     '<div style="position: fixed; bottom: 10px; right: 10px;">'
-    '© 2023 Irwanda B. Matematika ITS             '
+    '© 2023 Irwanda B. Matematika ITS                                   .'
     '</div>',
     unsafe_allow_html=True
 )
