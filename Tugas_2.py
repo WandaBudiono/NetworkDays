@@ -307,3 +307,10 @@ if Tugas_2 is not None:
         st.download_button(label="Download Excel", data=byte_io, file_name=excel_filename)
 else:
     st.warning("Please upload a CSV file to get started.")
+
+st.write(
+    '<div style="position: fixed; bottom: 10px; right: 10px;">'
+    '© 2023 Irwanda B. Matematika ITS'
+    '</div>',
+    unsafe_allow_html=True
+)
