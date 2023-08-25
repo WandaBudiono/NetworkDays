@@ -314,16 +314,3 @@ st.write(
     '</div>',
     unsafe_allow_html=True
 )
-st.write(
-    """
-    <div style="position: relative;">
-        <div style="position: absolute; bottom: 10px; left: 10px;">
-            © 2023 Irwanda B. Matematika ITS.
-        </div>
-        <div style="position: fixed; bottom: 10px; right: 10px;">
-            Hosted by Streamlit
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
